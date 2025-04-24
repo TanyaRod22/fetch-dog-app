@@ -1,0 +1,5 @@
+[[headers]]
+  for = "/*"
+  [headers.values]
+    Access-Control-Allow-Origin = "https://frontend-take-home-service.fetch.com"
+    Access-Control-Allow-Credentials = "true"
