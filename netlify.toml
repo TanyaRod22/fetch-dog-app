@@ -1,6 +1,5 @@
-[[redirects]]
-  from = "/api/*"
-  to = "https://frontend-take-home-service.fetch.com/:splat"
-  status = 200
-  force = true
-  headers = { Access-Control-Allow-Origin = "*", Access-Control-Allow-Credentials = "true" }
+[[headers]]
+  for = "/*"
+  [headers.values]
+    Access-Control-Allow-Origin = "https://frontend-take-home-service.fetch.com"
+    Access-Control-Allow-Credentials = "true"
