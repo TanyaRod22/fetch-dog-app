@@ -30,8 +30,8 @@
 
     const fetchBreeds = async () => {
         
-        const res = await fetch("https://frontend-take-home-service.fetch.com/dogs/breeds", {
-        method: "GET",
+        const res = await fetch("/api/dogs/breeds", {
+        method: "POST",
         credentials: "include",
         });
         const data = await res.json();
@@ -52,14 +52,16 @@
         queryParams.append("sort", `breed:${sort}`);
     
         const res = await fetch(
-            `https://frontend-take-home-service.fetch.com/dogs/search?${queryParams.toString()}`,
-            { credentials: "include" }
+            `/api/dogs/search?${queryParams.toString()}`,
+            { credentials: "include",
+              method: "POST"
+             }
         );
         const data = await res.json();
         setTotal(data.total);
     
-        const dogsRes = await fetch("https://frontend-take-home-service.fetch.com/dogs", {
-            method: "GET",
+        const dogsRes = await fetch("/api/dogs", {
+            method: "POST",
             credentials: "include",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify(data.resultIds),
@@ -81,7 +83,7 @@
     };
 
     const handleMatch = async () => {
-      const res = await fetch("https://frontend-take-home-service.fetch.com/dogs/match", {
+      const res = await fetch("/api/dogs/match", {
         method: "POST",
         credentials: "include",
         headers: { "Content-Type": "application/json" },
@@ -89,8 +91,8 @@
       });
       const { match } = await res.json();
     
-      const dogRes = await fetch("https://frontend-take-home-service.fetch.com/dogs", {
-        method: "GET",
+      const dogRes = await fetch("/api/dogs", {
+        method: "POST",
         credentials: "include",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify([match]),
