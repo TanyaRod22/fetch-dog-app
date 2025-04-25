@@ -7,6 +7,10 @@ interface FilterBarProps {
   setSelectedBreeds: (breeds: string[]) => void;
   sort: "asc" | "desc";
   setSort: (value: "asc" | "desc") => void;
+  city: string;
+  setCity: (val: string) => void;
+  state: string;
+  setState: (val: string) => void;
 }
 
 const FilterBar: FC<FilterBarProps> = ({
@@ -15,48 +19,76 @@ const FilterBar: FC<FilterBarProps> = ({
   setSelectedBreeds,
   sort,
   setSort,
+  city,
+  setCity,
+  state,
+  setState,
 }) => {
-  // ✅ Move this inside the component where breeds is available
-  const breedOptions = breeds.map((breed: string) => ({ value: breed, label: breed }));
+  const breedOptions = breeds.map((breed: string) => ({
+    value: breed,
+    label: breed,
+  }));
 
   return (
-  <div className="flex flex-col sticky md:flex-row justify-between items-center gap-4 w-full">
-    {/* Left: Breed Selector */}
-    <div className="flex items-center gap-3 w-full md:w-auto">
-      <label className="text-sm font-semibold text-gray-700 whitespace-nowrap">Filter:</label>
-      <div className="w-full md:w-72">
+    <div className="flex flex-col md:flex-row flex-wrap justify-between items-center gap-4 w-full">
+      {/* Breed Select */}
+      <div className="flex items-center gap-2 w-full md:w-[300px]">
+        <label className="text-sm font-semibold text-gray-700 whitespace-nowrap">Breed:</label>
         <Select
           isMulti
           options={breedOptions}
-          placeholder="Find your match here"
-          className="text-sm"
+          placeholder="Select breed(s)"
+          className="text-sm w-full"
           classNamePrefix="react-select"
           styles={{
             control: (base) => ({
               ...base,
               borderRadius: "0.5rem",
-              borderColor: "#a78bfa", // Tailwind purple-400
+              borderColor: "#a78bfa",
               boxShadow: "0 0 0 1px #a78bfa",
-              '&:hover': { borderColor: "#7c3aed" }, // Tailwind purple-600
+              '&:hover': { borderColor: "#7c3aed" },
             }),
           }}
           onChange={(selected) => setSelectedBreeds(selected.map((s) => s.value))}
           value={breedOptions.filter((opt) => selectedBreeds.includes(opt.value))}
         />
       </div>
-    </div>
 
-    {/* Right: Sort Button */}
-    <div className="flex items-center gap-3 justify-end w-full md:w-auto">
-      <label className="text-sm font-semibold text-gray-700 whitespace-nowrap">Sort by Breed:</label>
-      <button
-        onClick={() => setSort(sort === "asc" ? "desc" : "asc")}
-        className="flex items-center gap-2 bg-purple-600 text-white px-4 py-2 rounded-lg shadow hover:bg-purple-700 transition text-sm"
-      >
-        {sort === "asc" ? "Ascending ⬆️" : "Descending ⬇️"}
-      </button>
+      {/* City Filter */}
+      <div className="flex items-center gap-2">
+        <label className="text-sm font-semibold text-gray-700">City:</label>
+        <input
+          type="text"
+          value={city}
+          onChange={(e) => setCity(e.target.value)}
+          placeholder="New York"
+          className="text-sm border border-purple-300 rounded-md px-2 py-1 focus:outline-none focus:ring-2 focus:ring-purple-400"
+        />
+      </div>
+
+      {/* State Filter */}
+      <div className="flex items-center gap-2">
+        <label className="text-sm font-semibold text-gray-700">State:</label>
+        <input
+          type="text"
+          value={state}
+          onChange={(e) => setState(e.target.value)}
+          placeholder="NY"
+          className="text-sm border border-purple-300 rounded-md px-2 py-1 w-16 uppercase focus:outline-none focus:ring-2 focus:ring-purple-400"
+        />
+      </div>
+
+      {/* Sort Button */}
+      <div className="flex items-center gap-2 justify-end">
+        <label className="text-sm font-semibold text-gray-700">Sort:</label>
+        <button
+          onClick={() => setSort(sort === "asc" ? "desc" : "asc")}
+          className="bg-purple-600 text-white px-4 py-2 rounded-lg hover:bg-purple-700 transition text-sm"
+        >
+          {sort === "asc" ? "Ascending ⬆️" : "Descending ⬇️"}
+        </button>
+      </div>
     </div>
-  </div>
   );
 };
 

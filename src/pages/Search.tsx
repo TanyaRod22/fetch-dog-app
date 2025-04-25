@@ -1,3 +1,4 @@
+// 🔍 Updated Search.tsx
 import { useEffect, useState } from "react";
 import { FiSearch } from "react-icons/fi";
 import DogCard from "../components/DogCard";
@@ -15,19 +16,27 @@ export default function Search() {
   const [sort, setSort] = useState<"asc" | "desc">("asc");
   const [from, setFrom] = useState<number>(0);
   const [total, setTotal] = useState<number>(0);
-  const size = 24;
+  const [loading, setLoading] = useState(true);
   const [matchedDog, setMatchedDog] = useState<Dog | null>(null);
   const [showMatchAnimation, setShowMatchAnimation] = useState(false);
   const [currentRouletteDog, setCurrentRouletteDog] = useState<Dog | null>(null);
   const [showFilters, setShowFilters] = useState(false);
+  const [city, setCity] = useState("");
+  const [state, setState] = useState("");
+  const [zipCodes, setZipCodes] = useState<string[]>([]);
+  const size = 24;
 
   useEffect(() => {
     fetchBreeds();
   }, []);
 
   useEffect(() => {
+    fetchZipCodes();
+  }, [city, state]);
+
+  useEffect(() => {
     fetchDogs();
-  }, [selectedBreeds, sort, from]);
+  }, [selectedBreeds, sort, from, zipCodes]);
 
   const fetchBreeds = async () => {
     const res = await fetch("https://frontend-take-home-service.fetch.com/dogs/breeds", {
@@ -38,12 +47,32 @@ export default function Search() {
     setBreeds(data);
   };
 
-  const [loading, setLoading] = useState(true);
+  const fetchZipCodes = async () => {
+    if (!city && !state) {
+      setZipCodes([]);
+      return;
+    }
+
+    const res = await fetch("https://frontend-take-home-service.fetch.com/locations/search", {
+      method: "POST",
+      credentials: "include",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        city: city || undefined,
+        states: state ? [state] : undefined,
+        size: 100,
+      }),
+    });
+    const data = await res.json();
+    setZipCodes(data.results.map((loc: any) => loc.zip_code));
+  };
+
   const fetchDogs = async () => {
     setLoading(true);
     try {
       const queryParams = new URLSearchParams();
       selectedBreeds.forEach((b) => queryParams.append("breeds", b));
+      zipCodes.forEach((zip) => queryParams.append("zipCodes", zip));
       queryParams.append("size", size.toString());
       queryParams.append("from", from.toString());
       queryParams.append("sort", `breed:${sort}`);
@@ -78,7 +107,6 @@ export default function Search() {
 
   const handleMatch = async () => {
     setShowMatchAnimation(true);
-
     const res = await fetch("https://frontend-take-home-service.fetch.com/dogs", {
       method: "POST",
       credentials: "include",
@@ -95,7 +123,6 @@ export default function Search() {
 
     setTimeout(async () => {
       clearInterval(interval);
-
       const matchRes = await fetch("https://frontend-take-home-service.fetch.com/dogs/match", {
         method: "POST",
         credentials: "include",
@@ -103,7 +130,6 @@ export default function Search() {
         body: JSON.stringify(favorites),
       });
       const { match } = await matchRes.json();
-
       const finalRes = await fetch("https://frontend-take-home-service.fetch.com/dogs", {
         method: "POST",
         credentials: "include",
@@ -111,21 +137,17 @@ export default function Search() {
         body: JSON.stringify([match]),
       });
       const [dogData] = await finalRes.json();
-
       setMatchedDog(dogData);
       setShowMatchAnimation(false);
     }, 3000);
   };
 
   return (
-    <div className="flex flex-col min-h-screen w-full bg-gradient-to-br from-sky-100 to-purple-100">
-      {/* Header */}
+    <div className="flex flex-col min-h-screen w-screen bg-gradient-to-br from-sky-100 to-purple-100">
       <header className="sticky top-0 z-30 w-full bg-gradient-to-br from-sky-100 to-purple-100 shadow-md">
         <div className="flex items-center justify-between px-6 py-4">
           <h1 className="text-3xl font-bold text-purple-700">🐾 Find Your Dog</h1>
-
           <div className="flex items-center gap-3">
-            {/* Toggle Search Filters */}
             <button
               onClick={() => setShowFilters(!showFilters)}
               className="text-purple-700 hover:text-purple-900 p-2 rounded-full bg-white shadow"
@@ -133,8 +155,6 @@ export default function Search() {
             >
               <FiSearch size={20} />
             </button>
-
-            {/* Generate Match */}
             {favorites.length > 0 && (
               <button
                 onClick={handleMatch}
@@ -143,14 +163,11 @@ export default function Search() {
                 Generate Match ❤️
               </button>
             )}
-
-            {/* Logout */}
             <Logout />
           </div>
         </div>
       </header>
 
-      {/* Collapsible FilterBar */}
       {showFilters && (
         <div className="transition-all duration-300 ease-in-out px-6 py-4">
           <div className="bg-white shadow-md rounded-xl p-4 border border-purple-200">
@@ -160,12 +177,15 @@ export default function Search() {
               setSelectedBreeds={setSelectedBreeds}
               sort={sort}
               setSort={setSort}
+              city={city}
+              setCity={setCity}
+              state={state}
+              setState={setState}
             />
           </div>
         </div>
       )}
 
-      {/* Main Content */}
       <main className="flex-1 px-2 py-4 w-full">
         {loading ? (
           <div className="text-center py-12 text-gray-500">Loading dogs...</div>
@@ -187,14 +207,12 @@ export default function Search() {
         )}
       </main>
 
-      {/* Pagination */}
       <footer className="bg-white sticky bottom-0 z-30 w-full">
         <div className="w-full px-1 py-1">
           <Pagination from={from} setFrom={setFrom} size={size} total={total} />
         </div>
       </footer>
 
-      {/* Matching Animation */}
       {showMatchAnimation && currentRouletteDog && (
         <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center">
           <div className="bg-white p-6 rounded-xl shadow-lg text-center animate-pulse">
@@ -209,7 +227,6 @@ export default function Search() {
         </div>
       )}
 
-      {/* Final Match */}
       {matchedDog && <MatchModel dog={matchedDog} onClose={() => setMatchedDog(null)} />}
     </div>
   );
