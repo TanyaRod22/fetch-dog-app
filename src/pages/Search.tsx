@@ -21,9 +21,6 @@ export default function Search() {
   const [showMatchAnimation, setShowMatchAnimation] = useState(false);
   const [currentRouletteDog, setCurrentRouletteDog] = useState<Dog | null>(null);
   const [showFilters, setShowFilters] = useState(false);
-  const [city, setCity] = useState("");
-  const [state, setState] = useState("");
-  const [zipCodes, setZipCodes] = useState<string[]>([]);
   const size = 24;
 
   useEffect(() => {
@@ -31,12 +28,8 @@ export default function Search() {
   }, []);
 
   useEffect(() => {
-    fetchZipCodes();
-  }, [city, state]);
-
-  useEffect(() => {
     fetchDogs();
-  }, [selectedBreeds, sort, from, zipCodes]);
+  }, [selectedBreeds, sort]);
 
   const fetchBreeds = async () => {
     const res = await fetch("https://frontend-take-home-service.fetch.com/dogs/breeds", {
@@ -47,32 +40,12 @@ export default function Search() {
     setBreeds(data);
   };
 
-  const fetchZipCodes = async () => {
-    if (!city && !state) {
-      setZipCodes([]);
-      return;
-    }
-
-    const res = await fetch("https://frontend-take-home-service.fetch.com/locations/search", {
-      method: "POST",
-      credentials: "include",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        city: city || undefined,
-        states: state ? [state] : undefined,
-        size: 100,
-      }),
-    });
-    const data = await res.json();
-    setZipCodes(data.results.map((loc: any) => loc.zip_code));
-  };
 
   const fetchDogs = async () => {
     setLoading(true);
     try {
       const queryParams = new URLSearchParams();
       selectedBreeds.forEach((b) => queryParams.append("breeds", b));
-      zipCodes.forEach((zip) => queryParams.append("zipCodes", zip));
       queryParams.append("size", size.toString());
       queryParams.append("from", from.toString());
       queryParams.append("sort", `breed:${sort}`);
@@ -177,10 +150,6 @@ export default function Search() {
               setSelectedBreeds={setSelectedBreeds}
               sort={sort}
               setSort={setSort}
-              city={city}
-              setCity={setCity}
-              state={state}
-              setState={setState}
             />
           </div>
         </div>

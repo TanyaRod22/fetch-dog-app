@@ -7,10 +7,6 @@ interface FilterBarProps {
   setSelectedBreeds: (breeds: string[]) => void;
   sort: "asc" | "desc";
   setSort: (value: "asc" | "desc") => void;
-  city: string;
-  setCity: (val: string) => void;
-  state: string;
-  setState: (val: string) => void;
 }
 
 const FilterBar: FC<FilterBarProps> = ({
@@ -19,10 +15,6 @@ const FilterBar: FC<FilterBarProps> = ({
   setSelectedBreeds,
   sort,
   setSort,
-  city,
-  setCity,
-  state,
-  setState,
 }) => {
   const breedOptions = breeds.map((breed: string) => ({
     value: breed,
@@ -51,30 +43,6 @@ const FilterBar: FC<FilterBarProps> = ({
           }}
           onChange={(selected) => setSelectedBreeds(selected.map((s) => s.value))}
           value={breedOptions.filter((opt) => selectedBreeds.includes(opt.value))}
-        />
-      </div>
-
-      {/* City Filter */}
-      <div className="flex items-center gap-2">
-        <label className="text-sm font-semibold text-gray-700">City:</label>
-        <input
-          type="text"
-          value={city}
-          onChange={(e) => setCity(e.target.value)}
-          placeholder="New York"
-          className="text-sm border border-purple-300 rounded-md px-2 py-1 focus:outline-none focus:ring-2 focus:ring-purple-400"
-        />
-      </div>
-
-      {/* State Filter */}
-      <div className="flex items-center gap-2">
-        <label className="text-sm font-semibold text-gray-700">State:</label>
-        <input
-          type="text"
-          value={state}
-          onChange={(e) => setState(e.target.value)}
-          placeholder="NY"
-          className="text-sm border border-purple-300 rounded-md px-2 py-1 w-16 uppercase focus:outline-none focus:ring-2 focus:ring-purple-400"
         />
       </div>
 
