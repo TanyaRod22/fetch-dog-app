@@ -106,7 +106,7 @@
   return (
     <div className="flex flex-col w-screen min-h-screen bg-gradient-to-br from-sky-100 to-purple-100">
       {/* Heading */}
-      <header className="sticky top-0 z-30 w-full">
+      <header className="top-0 z-30 w-full">
         <div className="flex items-center justify-between px-4 py-6">
           <h1 className="text-3xl font-bold text-purple-700">🐾 Find Your Dog</h1>
           <Logout />
